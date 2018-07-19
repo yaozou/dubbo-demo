@@ -1,0 +1,9 @@
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:dubbo="http://code.alibabatech.com/schema/dubbo"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.1.xsd
+	http://code.alibabatech.com/schema/dubbo http://code.alibabatech.com/schema/dubbo/dubbo.xsd">
+
+	<!-- 声明需要暴露的服务接口 -->
+	<dubbo:service interface="com.leetu.dubbo.api.DemoService" ref="demoService" />
+	<!--<dubbo:service interface="com.mobao360.facade.pay.PayOrderFacade" ref="PayOrderFacadeImpl" protocol="rest,dubbo" validation="true" />-->
+</beans>
