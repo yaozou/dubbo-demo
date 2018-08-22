@@ -1,6 +1,7 @@
 package com.leetu.dubbo.provider.impl;
 
 import com.leetu.dubbo.api.DemoService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
 import javax.ws.rs.Path;
