@@ -2,7 +2,6 @@ package com.yao.api.registry;
 
 import com.yao.api.loadbalance.LoadBalance;
 import com.yao.api.loadbalance.RandomLoadBalance;
-import com.yao.server.bean.ZkConfig;
 
 import org.apache.curator.framework.CuratorFramework;
 import org.apache.curator.framework.CuratorFrameworkFactory;

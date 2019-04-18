@@ -85,6 +85,7 @@ public class RpcServer {
             String ip = addrs[0];
             int port = Integer.parseInt(addrs[1]);
             ChannelFuture future = bootstrap.bind(ip,port).sync();
+            System.out.println("netty server start succ.....");
         }catch (Exception e){
             e.printStackTrace();
         }

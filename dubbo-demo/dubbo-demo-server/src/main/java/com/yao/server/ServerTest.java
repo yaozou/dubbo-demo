@@ -14,13 +14,12 @@ import com.yao.server.rpc.RpcServer;
 public class ServerTest {
     public static void main(String[] args){
         IRegisterCenter registerCenter = new RegisterCenterImpl();
-
-        registerCenter.register("com.yao.server.api.IGpHello","127.0.0.1:8080");
-
         RpcServer rpcServer = new RpcServer(registerCenter,"127.0.0.1:8080");
 
         IGpHello iGpHello = new IGpHelloImpl();
         rpcServer.bind(iGpHello);
         rpcServer.publisher();
+
+        while (true){}
     }
 }

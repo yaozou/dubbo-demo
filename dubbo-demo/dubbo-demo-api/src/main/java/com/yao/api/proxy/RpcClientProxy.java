@@ -2,7 +2,6 @@ package com.yao.api.proxy;
 
 import com.yao.api.bean.RpcRequest;
 import com.yao.api.registry.IServiceDiscovery;
-import com.yao.server.rpc.RpcServerHandler;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
