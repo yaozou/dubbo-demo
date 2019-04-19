@@ -21,6 +21,7 @@ public class RpcServerHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
+        System.out.println("接收到消息："+msg);
         RpcRequest request = (RpcRequest) msg;
         Object result = new Object();
         if (handlerMap.containsKey(request.getClassName())){

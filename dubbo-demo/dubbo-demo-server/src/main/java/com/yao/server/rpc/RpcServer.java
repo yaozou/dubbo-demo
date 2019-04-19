@@ -72,10 +72,10 @@ public class RpcServer {
                 protected void initChannel(SocketChannel socketChannel) {
                     ChannelPipeline pipeline = socketChannel.pipeline();
                     pipeline.addLast("frameDecoder",new LengthFieldBasedFrameDecoder(
-                            Integer.MAX_VALUE,0,0));
+                            Integer.MAX_VALUE,5,2));
                     pipeline.addLast("frameEncoder",new LengthFieldPrepender(4));
                     pipeline.addLast("encoder",new ObjectEncoder());
-                    pipeline.addLast("Decoder",new ObjectDecoder(
+                    pipeline.addLast("decoder",new ObjectDecoder(
                             Integer.MAX_VALUE, ClassResolvers.cacheDisabled(RpcRequest.class.getClassLoader())));
                     pipeline.addLast(new RpcServerHandler(handlerMap));
 
@@ -85,7 +85,9 @@ public class RpcServer {
             String ip = addrs[0];
             int port = Integer.parseInt(addrs[1]);
             ChannelFuture future = bootstrap.bind(ip,port).sync();
-            System.out.println("netty server start succ.....");
+            if (future.isSuccess()){
+                System.out.println(serviceAddress+":netty server start success.....");
+            }
         }catch (Exception e){
             e.printStackTrace();
         }

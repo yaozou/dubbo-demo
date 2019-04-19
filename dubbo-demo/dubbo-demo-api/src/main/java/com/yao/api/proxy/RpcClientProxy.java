@@ -65,14 +65,18 @@ public class RpcClientProxy {
                                             Integer.MAX_VALUE,5,2));
                                     pipeline.addLast("frameEncoder",new LengthFieldPrepender(4));
                                     pipeline.addLast("encoder",new ObjectEncoder());
-                                    pipeline.addLast("Decoder",new ObjectDecoder(
+                                    pipeline.addLast("decoder",new ObjectDecoder(
                                             Integer.MAX_VALUE, ClassResolvers.cacheDisabled(com.yao.server.bean.RpcRequest.class.getClassLoader())));
                                    // 服务器交互的handler
                                     pipeline.addLast(rpcProxyHandler);
                                 }
                             });
                             ChannelFuture future = bootstrap.connect(host,port).sync();
+                            if (future.isSuccess()){
+                                System.out.println(serviceAddress+":连接成功....");
+                            }
                             future.channel().writeAndFlush(request);
+
                             future.channel().closeFuture().sync();
                         }catch (Exception e){
                             e.printStackTrace();
