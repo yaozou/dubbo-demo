@@ -20,8 +20,13 @@ public class RpcServerHandler extends ChannelInboundHandlerAdapter {
     }
 
     @Override
+    public void channelActive(ChannelHandlerContext ctx) throws Exception {
+        System.out.println(ctx.channel().localAddress().toString() + " 通道已激活！");
+    }
+
+    @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        System.out.println("接收到消息："+msg);
+        System.out.println("接收到客服端数据："+msg);
         RpcRequest request = (RpcRequest) msg;
         Object result = new Object();
         if (handlerMap.containsKey(request.getClassName())){

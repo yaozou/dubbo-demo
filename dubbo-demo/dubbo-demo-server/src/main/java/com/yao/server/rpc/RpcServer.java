@@ -1,9 +1,12 @@
 package com.yao.server.rpc;
 
+import com.yao.coder.RpcDecoder;
+import com.yao.coder.RpcEncoder;
 import com.yao.server.annotation.RpcAnnotation;
 import com.yao.server.bean.RpcRequest;
 import com.yao.server.registry.IRegisterCenter;
 
+import java.nio.charset.Charset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -19,9 +22,11 @@ import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioServerSocketChannel;
 import io.netty.handler.codec.LengthFieldBasedFrameDecoder;
 import io.netty.handler.codec.LengthFieldPrepender;
+import io.netty.handler.codec.bytes.ByteArrayEncoder;
 import io.netty.handler.codec.serialization.ClassResolvers;
 import io.netty.handler.codec.serialization.ObjectDecoder;
 import io.netty.handler.codec.serialization.ObjectEncoder;
+import io.netty.handler.codec.string.StringEncoder;
 
 /**
  * @Description:
@@ -59,32 +64,38 @@ public class RpcServer {
         for(String serviceName:handlerMap.keySet()){
             registerCenter.register(serviceName,serviceAddress);
         }
+        String[] addrs = serviceAddress.split(":");
+        String ip = addrs[0];
+        int port = Integer.parseInt(addrs[1]);
         //启动一个netty监听
         try{
             EventLoopGroup bossGroup = new NioEventLoopGroup();
             EventLoopGroup workGroup = new NioEventLoopGroup();
             // 启动netty服务
             ServerBootstrap bootstrap = new ServerBootstrap();
-            bootstrap.group(bossGroup,workGroup);
-            bootstrap.channel(NioServerSocketChannel.class);
-            bootstrap.childHandler(new ChannelInitializer<SocketChannel>() {
-                @Override
-                protected void initChannel(SocketChannel socketChannel) {
-                    ChannelPipeline pipeline = socketChannel.pipeline();
-                    pipeline.addLast("frameDecoder",new LengthFieldBasedFrameDecoder(
-                            Integer.MAX_VALUE,5,2));
-                    pipeline.addLast("frameEncoder",new LengthFieldPrepender(4));
-                    pipeline.addLast("encoder",new ObjectEncoder());
-                    pipeline.addLast("decoder",new ObjectDecoder(
-                            Integer.MAX_VALUE, ClassResolvers.cacheDisabled(RpcRequest.class.getClassLoader())));
-                    pipeline.addLast(new RpcServerHandler(handlerMap));
+            bootstrap.group(bossGroup,workGroup)
+                    .channel(NioServerSocketChannel.class)
+                    .localAddress(port)
+                    .childHandler(new ChannelInitializer<SocketChannel>() {
+                        @Override
+                        protected void initChannel(SocketChannel socketChannel) {
+                            System.out.println("报告");
+                            System.out.println("信息：有一客户端链接到本服务端");
+                            System.out.println("IP:" + socketChannel.localAddress().getHostName());
+                            System.out.println("Port:" + socketChannel.localAddress().getPort());
+                            System.out.println("报告完毕.....");
+                            ChannelPipeline pipeline = socketChannel.pipeline();
 
-                }
+                            pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
+                            pipeline.addLast("frameEncoder", new LengthFieldPrepender(4));
+                            pipeline.addLast("encoder", new ObjectEncoder());
+                            pipeline.addLast("decoder", new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers.cacheDisabled(null)));
+
+                            pipeline.addLast(new RpcServerHandler(handlerMap));
+
+                        }
             }).option(ChannelOption.SO_BACKLOG,128).childOption(ChannelOption.SO_KEEPALIVE,true);
-            String[] addrs = serviceAddress.split(":");
-            String ip = addrs[0];
-            int port = Integer.parseInt(addrs[1]);
-            ChannelFuture future = bootstrap.bind(ip,port).sync();
+            ChannelFuture future = bootstrap.bind().sync();
             if (future.isSuccess()){
                 System.out.println(serviceAddress+":netty server start success.....");
             }
