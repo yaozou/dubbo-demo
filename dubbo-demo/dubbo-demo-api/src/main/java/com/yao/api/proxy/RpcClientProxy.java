@@ -1,11 +1,11 @@
 package com.yao.api.proxy;
 
 import com.yao.api.registry.IServiceDiscovery;
+import com.yao.server.bean.RpcRequest;
 
 import java.lang.reflect.InvocationHandler;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
-import java.net.InetSocketAddress;
 
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.ChannelFuture;
@@ -59,46 +59,35 @@ class RpcClientHandler implements InvocationHandler {
         int port = Integer.parseInt(addrs[1]);
         //url netty请求
         // 封装request
-        /*RpcRequest request = new RpcRequest();
+        RpcRequest request = new RpcRequest();
         request.setClassName(method.getDeclaringClass().getName());
         request.setMethodName(method.getName());
         request.setTypes(method.getParameterTypes());
-        request.setParams(args);*/
+        request.setParams(args);
         // 发socket netty
         final RpcProxyHandler rpcProxyHandler = new RpcProxyHandler();
         //启动一个netty监听
         EventLoopGroup group = new NioEventLoopGroup();
         try {
-            // 启动netty服务
-            Bootstrap bootstrap = new Bootstrap();
-            bootstrap.group(group)
+            Bootstrap b = new Bootstrap();
+            b.group(group)
                     .channel(NioSocketChannel.class)
-                    .remoteAddress(new InetSocketAddress(host, port))
                     .option(ChannelOption.TCP_NODELAY, true)
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
-                        protected void initChannel(SocketChannel socketChannel) {
-                            ChannelPipeline pipeline = socketChannel.pipeline();
-
+                        public void initChannel(SocketChannel ch) throws Exception {
+                            ChannelPipeline pipeline = ch.pipeline();
                             pipeline.addLast("frameDecoder", new LengthFieldBasedFrameDecoder(Integer.MAX_VALUE, 0, 4, 0, 4));
                             pipeline.addLast("frameEncoder", new LengthFieldPrepender(4));
                             pipeline.addLast("encoder", new ObjectEncoder());
                             pipeline.addLast("decoder", new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers.cacheDisabled(null)));
-
-                            // 服务器交互的handler
-                            pipeline.addLast(rpcProxyHandler);
+                            pipeline.addLast("handler",rpcProxyHandler);
                         }
                     });
-            ChannelFuture future = bootstrap.connect().sync();
-            if (future.isSuccess()) {
-                System.out.println("连接成功....");
-            }
-            future.channel().writeAndFlush(new String("123456"));
-            System.out.println("发送信息...."); // 关闭完成
+
+            ChannelFuture future = b.connect("localhost", 8080).sync();
+            future.channel().writeAndFlush(request).sync();
             future.channel().closeFuture().sync();
-            System.out.println("连接已关闭.."); // 关闭完成
-        } catch (Exception e) {
-            e.printStackTrace();
         } finally {
             group.shutdownGracefully();
         }
