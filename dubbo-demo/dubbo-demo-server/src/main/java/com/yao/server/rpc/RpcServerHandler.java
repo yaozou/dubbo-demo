@@ -33,7 +33,7 @@ public class RpcServerHandler extends ChannelInboundHandlerAdapter {
             // 调用map中的之类对象进行执行
            Object clazz =  handlerMap.get(request.getClassName());
            Method method = clazz.getClass().getMethod(request.getMethodName(),request.getTypes());
-           method.invoke(clazz,request.getParams());
+            result = method.invoke(clazz,request.getParams());
         }
         ctx.write(result);
         ctx.flush();
