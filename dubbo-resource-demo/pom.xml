@@ -5,12 +5,12 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.yao</groupId>
-    <artifactId>dubbo-demo</artifactId>
+    <artifactId>dubbo-resource-demo</artifactId>
     <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <modules>
-        <module>dubbo-demo-api</module>
-        <module>dubbo-demo-server</module>
+        <module>dubbo-resource-api</module>
+        <module>dubbo-resource-server</module>
     </modules>
 
 
