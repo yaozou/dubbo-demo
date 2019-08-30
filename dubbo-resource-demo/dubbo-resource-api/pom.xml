@@ -14,7 +14,7 @@
     <dependencies>
         <dependency>
             <groupId>com.yao</groupId>
-            <artifactId>dubbo-demo-server</artifactId>
+            <artifactId>dubbo-resource-server</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
 
